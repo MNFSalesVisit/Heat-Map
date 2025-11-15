@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sales Visit App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<style>
+  :root {
+    --primary: #0066ff;
+    --primary-dark: #0047b3;
+    --bg: #f1f4f9;
+    --card-bg: #ffffff;
+    --text-dark: #1a1a1a;
+    --text-light: #666;
+    --radius: 14px;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: var(--bg);
+    overflow-x: hidden;
+  }
+
+  /* Top Navigation */
+  #topNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 20px;
+    font-size: 20px;
+    font-weight: 500;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #logoutBtn {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    color: white;
+    font-size: 14px;
+    transition: 0.3s;
+  }
+  #logoutBtn:hover { background: rgba(255,255,255,0.3); }
+
+  /* Main content starts after nav */
+  #content {
+    margin-top: 70px;
+    padding: 16px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Inputs */
+  input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid #ddd;
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 15px;
+    transition: 0.2s;
+  }
+  input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(0,102,255,0.2);
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* Buttons */
+  button {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    font-size: 17px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: var(--shadow);
+  }
+  button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+  button:active { transform: scale(0.98); }
+
+  /* Selfie section */
+  #camera {
+    width: 100%;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+  }
+  #preview {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius);
+    border: 2px solid #ddd;
+    object-fit: cover;
+    margin-top: 10px;
+  }
+
+  .hidden { display: none; }
+
+  /* Mobile bottom navigation (future upgrade ready) */
+  #bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: #fff;
+    width: 100%;
+    padding: 12px 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    display: none;
+    justify-content: space-around;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+
+  /* Smooth scrolling */
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div id="topNav" class="hidden">
+  Sales Visit App
+  <button id="logoutBtn" onclick="logout()">Logout</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="content">
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginCard" class="card">
+    <h2 style="margin-top:0;">Login</h2>
+
+    <label>National ID</label>
+    <input id="idInput">
+
+    <label>Password</label>
+    <input id="passInput" type="password">
+
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainUI" class="hidden">
+
+    <!-- DASHBOARD -->
+    <div class="card">
+      <h3>Your Analytics (MTD)</h3>
+      <p>Visits: <b id="vMTD">0</b></p>
+      <p>Shops Sold: <b id="sMTD">0</b></p>
+      <p>Cartons Sold: <b id="cMTD">0</b></p>
+      <p>Efficiency: <b id="eMTD">0%</b></p>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+      <h3>Sales Visit Form</h3>
+
+      <label>ID</label>
+      <input id="uid" disabled>
+
+      <label>Name</label>
+      <input id="uname" disabled>
+
+      <label>Region</label>
+      <select id="region">
+        <option value="">Select Region</option>
+        <option>Mvita</option>
+        <option>Nyali</option>
+        <option>Kisauni</option>
+        <option>Likoni</option>
+        <option>Changamwe</option>
+        <option>Jomvu</option>
+      </select>
+
+      <label>Shop Name</label>
+      <input id="shop">
+
+      <label>Sold?</label>
+      <select id="sold" onchange="toggleSold()">
+        <option value="">Select</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+
+      <div id="soldSection" class="hidden">
+        <label>Cartons</label>
+        <input type="number" id="cartons">
+
+        <label>SKU</label>
+        <select id="sku">
+          <option>Beef</option>
+          <option>Chicken</option>
+          <option>Supa Mojo</option>
+        </select>
+      </div>
+
+      <div id="reasonSection" class="hidden">
+        <label>Reason</label>
+        <select id="reason" onchange="toggleOtherReason()">
+          <option value="">Select</option>
+          <option>Financial Constraint</option>
+          <option>Not Moving</option>
+          <option>Prefers Competitor Product</option>
+          <option>Other</option>
+        </select>
+
+        <input id="otherReason" class="hidden" placeholder="Enter reason">
+      </div>
+
+      <h4>Selfie</h4>
+      <video id="camera" autoplay></video>
+      <button onclick="capture()">Capture</button>
+      <center><img id="preview"></center>
+
+      <br><br>
+      <button onclick="submitForm()">Submit Visit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const backend = "https://script.google.com/macros/s/AKfycbxPuK8Vwl30zuyrutpLZfu81LYjPzPMUPCFBNxWzL-w5grgcx0vDtMBp9l5WJRuj2cC/exec";
+let currentUser = null;
+let selfieData = "";
+
+/* ---------------- LOGIN ---------------- */
+function login() {
+  fetch(backend, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "login",
+      nationalID: idInput.value,
+      password: passInput.value
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (!res.success) return alert("Invalid login");
+
+    currentUser = res;
+    uid.value = res.nationalID;
+    uname.value = res.name;
+
+    loginCard.classList.add("hidden");
+    topNav.classList.remove("hidden");
+    mainUI.classList.remove("hidden");
+
+    loadDashboard();
+    startCamera();
+  });
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function loadDashboard() {
+  fetch(backend, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "dashboard",
+      nationalID: currentUser.nationalID
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    vMTD.textContent = d.visitsMTD;
+    sMTD.textContent = d.soldMTD;
+    cMTD.textContent = d.cartonsMTD;
+    eMTD.textContent = d.efficiency + "%";
+  });
+}
+
+/* ---------------- CAMERA ---------------- */
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => camera.srcObject = stream);
+}
+function capture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 120;
+  canvas.height = 120;
+  canvas.getContext("2d").drawImage(camera, 0, 0, 120, 120);
+  selfieData = canvas.toDataURL();
+  preview.src = selfieData;
+}
+
+/* ---------------- SOLD LOGIC ---------------- */
+function toggleSold() {
+  soldSection.classList.add("hidden");
+  reasonSection.classList.add("hidden");
+  if (sold.value === "Yes") soldSection.classList.remove("hidden");
+  if (sold.value === "No") reasonSection.classList.remove("hidden");
+}
+function toggleOtherReason() {
+  if (reason.value === "Other") {
+    otherReason.classList.remove("hidden");
+  } else {
+    otherReason.classList.add("hidden");
+  }
+}
+
+/* ---------------- SUBMIT FORM ---------------- */
+function submitForm() {
+  navigator.geolocation.getCurrentPosition(pos => {
+    const payload = {
+      action: "saveVisit",
+      record: {
+        nationalID: currentUser.nationalID,
+        name: currentUser.name,
+        region: region.value,
+        shopName: shop.value,
+        sold: sold.value,
+        cartons: sold.value === "Yes" ? cartons.value : "",
+        sku: sold.value === "Yes" ? sku.value : "",
+        reason: sold.value === "No" ? (reason.value === "Other" ? otherReason.value : reason.value) : "",
+        longitude: pos.coords.longitude,
+        latitude: pos.coords.latitude,
+        selfie: selfieData
+      }
+    };
+
+    fetch(backend, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(() => {
+      alert("Visit submitted successfully!");
+      shop.value = "";
+      cartons.value = "";
+      reason.value = "";
+      otherReason.value = "";
+      preview.src = "";
+      selfieData = "";
+      loadDashboard();
+    });
+  });
+}
+
+/* ---------------- LOGOUT ---------------- */
+function logout() {
+  location.reload();
+}
+</script>
+
+</body>
+</html>
